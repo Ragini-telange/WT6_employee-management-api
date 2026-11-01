@@ -1,0 +1,73 @@
+{
+  "info": {
+    "_postman_id": "b74f9ef1-9b9b-4c2f-ae7e-employee-api-0001",
+    "name": "Employee Management API",
+    "description": "CRUD and validation requests for the Employee Management REST API. Set employeeId after creating an employee.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "employeeId", "value": "PASTE_EMPLOYEE_ID_HERE" }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/health" }
+    },
+    {
+      "name": "Create Employee",
+      "event": [{
+        "listen": "test",
+        "script": { "type": "text/javascript", "exec": [
+          "pm.test('Status is 201 Created', function () { pm.response.to.have.status(201); });",
+          "const body = pm.response.json();",
+          "if (body.data && body.data._id) { pm.collectionVariables.set('employeeId', body.data._id); }"
+        ] }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"name\": \"Aarav Patil\",\n  \"email\": \"aarav.patil@example.com\",\n  \"department\": \"IT\",\n  \"position\": \"Software Developer\",\n  \"salary\": 45000\n}", "options": { "raw": { "language": "json" } } },
+        "url": "{{baseUrl}}/api/employees"
+      }
+    },
+    {
+      "name": "Get All Employees",
+      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/employees" }
+    },
+    {
+      "name": "Get Employee By ID",
+      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/employees/{{employeeId}}" }
+    },
+    {
+      "name": "Update Employee",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"position\": \"Senior Software Developer\",\n  \"salary\": 55000\n}", "options": { "raw": { "language": "json" } } },
+        "url": "{{baseUrl}}/api/employees/{{employeeId}}"
+      }
+    },
+    {
+      "name": "Delete Employee",
+      "request": { "method": "DELETE", "header": [], "url": "{{baseUrl}}/api/employees/{{employeeId}}" }
+    },
+    {
+      "name": "Invalid - Missing Required Fields (expect 400)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"missing.name@example.com\"\n}", "options": { "raw": { "language": "json" } } },
+        "url": "{{baseUrl}}/api/employees"
+      }
+    },
+    {
+      "name": "Invalid - Malformed Employee ID (expect 400)",
+      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/employees/not-a-valid-id" }
+    },
+    {
+      "name": "Not Found - Valid Format ID That Does Not Exist (expect 404)",
+      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/employees/507f1f77bcf86cd799439011" }
+    }
+  ]
+}
